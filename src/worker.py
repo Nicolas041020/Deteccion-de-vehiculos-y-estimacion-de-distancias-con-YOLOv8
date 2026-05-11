@@ -7,14 +7,15 @@ import os
 class Worker(QThread):
     frameReady = pyqtSignal(np.ndarray)
 
-    def __init__(self):
+    def __init__(self, fuente=0):
         super().__init__()
         self._corriendo = False
         self._yolo_activo = False
         self.modelo = None
+        self.fuente = fuente
 
     def run(self):
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(self.fuente)
         self._corriendo = True
         while self._corriendo:
             ret, frame = cap.read()

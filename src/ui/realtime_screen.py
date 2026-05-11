@@ -1,24 +1,18 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout
 from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from src.worker import Worker
 import cv2
 
-class MainWindow(QMainWindow):
+class RealTimeScreen(QWidget):
+    navegar = pyqtSignal(int)
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Detección vehícular con YOLOv8")
-        self.setMinimumSize(800, 600)
-
         self.worker = Worker()
         self.worker.frameReady.connect(self.actualizar_frame)
-
         self._init_ui()
 
     def _init_ui(self):
-        # Widget Central
-        contenedor = QWidget()
-        self.setCentralWidget(contenedor)
 
         #label video
         self.label_video = QLabel("Camara Apagada")
@@ -26,23 +20,33 @@ class MainWindow(QMainWindow):
         self.label_video.setMinimumSize(640, 480)
         self.label_video.setScaledContents(True)
 
+        self.btn_volver = QPushButton("←")
         self.btn_camara = QPushButton("Activar Cámara")
         self.btn_detection = QPushButton("Activar Detección")
         self.btn_detection.setEnabled(False)
-
+        
         layout_botones = QHBoxLayout()
         layout_botones.addWidget(self.btn_camara)
         layout_botones.addWidget(self.btn_detection)
 
+        layout_volver = QHBoxLayout()
+        layout_volver.addWidget(self.btn_volver)
+
+        #Estilo
+        self.btn_volver.setMaximumWidth(30)
+        layout_volver.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
         layout_principal = QVBoxLayout()
+        layout_principal.addLayout(layout_volver)
         layout_principal.addWidget(self.label_video)
         layout_principal.addLayout(layout_botones)
 
-        contenedor.setLayout(layout_principal)
+        self.setLayout(layout_principal)
 
         # Conectar botones
         self.btn_camara.clicked.connect(self.toggle_camara)
         self.btn_detection.clicked.connect(self.toggle_deteccion)
+        self.btn_volver.clicked.connect(lambda: self.navegar.emit(0))
 
     def toggle_camara(self):
         if not self.worker.isRunning():
