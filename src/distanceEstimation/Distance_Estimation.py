@@ -8,18 +8,27 @@ class DistanceEstimation:
     
     @staticmethod
     def obtainPixelHeight(result):
-        clases_interes = [2, 3]  # car y motorcycle
+        clases_interes = [2, 3,5]  # car, motorcycle y Bus
         lista_tamanos =[]
+        H_mean = 0.0
         for box in result:
             clase_id = int(box.cls[0])
             if clase_id not in clases_interes:
                 continue
+
+            if clase_id == 2:
+                H_mean = 1.55
+            elif clase_id == 3:
+                H_mean = 0.80
+            elif clase_id == 5:
+                H_mean = 3.0
 
             x1, y1, x2, y2 = box.xyxy[0]
             H_px = y2 - y1
             lista_tamanos.append({
                 'clase_id': clase_id,
                 'H_px': float(H_px),
+                'H_mean':float(H_mean),
                 'bbox': (float(x1), float(y1), float(x2), float(y2))
             })
         
@@ -31,8 +40,8 @@ class DistanceEstimation:
         return os.path.splitext(os.path.basename(filename))[0]
     
     @staticmethod
-    def getParameters(name):
-        ruta = os.path.join('Dataset','data_object_calib', 'training', 'calib', f'{name}.txt')
+    def getParametersValidation(name):
+        ruta = os.path.join('dataset','data_object_calib', 'training', 'calib', f'{name}.txt')
         with open(ruta,'r') as f:
             lineas = f.readlines()
             for line in lineas:
@@ -46,16 +55,16 @@ class DistanceEstimation:
 
     
     @staticmethod
-    def run(filename, result):
+    def runValidation(filename, result):
         distancias = []
         name = DistanceEstimation.returnFilename(filename)
-        H_real = [1.42,1.88]
-        fx, cx, cy = DistanceEstimation.getParameters(name)
+        #H_real = [1.42,1.88]
+        fx, cx, cy = DistanceEstimation.getParametersValidation(name)
         res = DistanceEstimation.obtainPixelHeight(result)
         
         for i,obj in enumerate(res):
             z = DistanceEstimation.estimateDistance(
-                H_real[i],
+                obj['H_mean'],
                 obj['H_px'],
                 fx
             )

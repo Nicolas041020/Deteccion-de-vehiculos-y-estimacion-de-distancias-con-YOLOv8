@@ -6,10 +6,12 @@ import cv2
 from src.detection.yolo_detection import YoloDetection
 from src.worker import Worker
 from src.distanceEstimation.Distance_Estimation import DistanceEstimation
-
+import os 
 class UploadScreen(QWidget):
     navegar = pyqtSignal(int)
-    yolo = YoloDetection("models/weights/yolov8n.pt")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    ruta = os.path.join(BASE_DIR,'..','..','models','yolov8n.pt')
+    yolo = YoloDetection(ruta)
     
     def __init__(self):
         super().__init__()
@@ -59,8 +61,8 @@ class UploadScreen(QWidget):
                 detection = self.yolo.detect(imagen)
                 self.imagen_actual = detection[0].plot()
                 self.mostrar_resultados(self.imagen_actual)
-                print('Distancias')
-                print(DistanceEstimation.run(filename,detection[0].boxes))
+                #print('Distancias')
+                #print(DistanceEstimation.runValidation(filename,detection[0].boxes))
                 pass
             elif tipo == 'vid':
                 if hasattr(self, 'worker') and self.worker.isRunning():

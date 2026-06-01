@@ -3,6 +3,7 @@ import numpy as np
 from ultralytics import YOLO
 import cv2
 import os
+import time
 
 class Worker(QThread):
     frameReady = pyqtSignal(np.ndarray)
@@ -16,6 +17,9 @@ class Worker(QThread):
 
     def run(self):
         cap = cv2.VideoCapture(self.fuente)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        delay = 1.0 / fps if fps > 0 else 1.0 / 30
+
         self._corriendo = True
         while self._corriendo:
             ret, frame = cap.read()
@@ -28,6 +32,7 @@ class Worker(QThread):
                 frame = results[0].plot()
 
             self.frameReady.emit(frame)
+            time.sleep(delay)
 
         cap.release()
 
@@ -38,7 +43,7 @@ class Worker(QThread):
     def activar_yolo(self):
         if self.modelo is None:
             BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-            self.modelo = YOLO(os.path.join(BASE_DIR,"models","weights","yolov8n.pt"))
+            self.modelo = YOLO(os.path.join(BASE_DIR,'..',"models","yolov8n.pt"))
         self._yolo_activo = True
 
     def desactivar_yolo(self):
