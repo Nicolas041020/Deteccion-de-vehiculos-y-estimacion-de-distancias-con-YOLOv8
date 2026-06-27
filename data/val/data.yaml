@@ -1,0 +1,14 @@
+path: C:\Users\nicoc\Downloads\Tesis NNs\TesisLab\Deteccion-de-vehiculos-y-estimacion-de-distancias-con-YOLOv8\data
+train: val\nuevo\images
+val: val\nuevo\images
+test: val\nuevo\images
+
+nc: 6
+names: ['bicycle', 'bus', 'car', 'motorcycle', 'person', 'truck']
+
+roboflow:
+  workspace: nicolass-workspace-bzgge
+  project: tesis2-syte1
+  version: dataset
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/nicolass-workspace-bzgge/tesis2-syte1/dataset/dataset

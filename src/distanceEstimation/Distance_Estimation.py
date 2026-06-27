@@ -8,7 +8,7 @@ class DistanceEstimation:
     
     @staticmethod
     def obtainPixelHeight(result):
-        clases_interes = [2, 3,5]  # car, motorcycle y Bus
+        clases_interes = [2, 3,5,7]  # car, motorcycle, Bus y Truck
         lista_tamanos =[]
         H_mean = 0.0
         for box in result:

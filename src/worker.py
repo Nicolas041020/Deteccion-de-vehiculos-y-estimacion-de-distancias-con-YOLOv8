@@ -4,9 +4,11 @@ from ultralytics import YOLO
 import cv2
 import os
 import time
+from src.detection.yolo_detection import YoloDetection
 
 class Worker(QThread):
     frameReady = pyqtSignal(np.ndarray)
+    detecciones = pyqtSignal(list)
 
     def __init__(self, fuente=0):
         super().__init__()
@@ -14,7 +16,7 @@ class Worker(QThread):
         self._yolo_activo = False
         self.modelo = None
         self.fuente = fuente
-
+        
     def run(self):
         cap = cv2.VideoCapture(self.fuente)
         fps = cap.get(cv2.CAP_PROP_FPS)
@@ -25,11 +27,14 @@ class Worker(QThread):
             ret, frame = cap.read()
 
             if not ret:
+                self._corriendo = False
                 break
 
             if self._yolo_activo and self.modelo is not None:
                 results = self.modelo(frame)
+                self.detecciones.emit(YoloDetection.parseToDictionary(None,results))
                 frame = results[0].plot()
+                print(self.modelo.device)
 
             self.frameReady.emit(frame)
             time.sleep(delay)
