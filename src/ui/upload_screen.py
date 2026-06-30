@@ -66,7 +66,6 @@ class UploadScreen(QWidget):
                 raw_result = self.yolo.detect(imagen)
                 self.imagen_actual = raw_result[0].plot()
                 detecciones = self.yolo.parseToDictionary(None,raw_result)
-                
                 self.mostrar_resultados(self.imagen_actual)
                 self.procesar_detecciones(detecciones)
                 #for r in detection:
