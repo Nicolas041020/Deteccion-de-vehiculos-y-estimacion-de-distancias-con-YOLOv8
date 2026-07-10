@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow,QWidget, QStackedWidget
 from src.ui.home_screen import HomeScreen
 from src.ui.realtime_screen import RealTimeScreen
 from src.ui.upload_screen import UploadScreen
+from src.ui.validation_screen import ValidationScreen
 
 
 class MainWindow(QMainWindow):  
@@ -16,13 +17,16 @@ class MainWindow(QMainWindow):
         self.home_screen = HomeScreen()
         self.realtime_screen = RealTimeScreen()
         self.upload_screen = UploadScreen()
+        self.validation_screen = ValidationScreen()
 
         self.stack.addWidget(self.home_screen)
         self.stack.addWidget(self.realtime_screen)
         self.stack.addWidget(self.upload_screen)
+        self.stack.addWidget(self.validation_screen)
         self.home_screen.navegar.connect(self.cambiar_pantalla)
         self.realtime_screen.navegar.connect(self.cambiar_pantalla)
         self.upload_screen.navegar.connect(self.cambiar_pantalla)
+        self.validation_screen.navegar.connect(self.cambiar_pantalla)
         self.setCentralWidget(self.stack)
 
     def cambiar_pantalla(self, index):

@@ -8,8 +8,7 @@ class YoloDetection:
         results = self.model(image)
         return results
     
-    @staticmethod
-    def parseToDictionary(self,result):
+    def parseToDictionary(self, result):
         detecciones = []
         for box in result[0].boxes:
             bounding = box.xyxy[0].tolist()

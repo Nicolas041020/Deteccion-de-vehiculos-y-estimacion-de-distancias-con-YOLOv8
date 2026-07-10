@@ -12,14 +12,17 @@ class HomeScreen(QWidget):
 
         self.button_realtime = QPushButton("Detección en Tiempo Real")
         self.button_upload = QPushButton("Subir Video/Imagen")
+        self.button_validation = QPushButton("Validación KITTI")
 
         layout_botones = QVBoxLayout()
         layout_botones.addWidget(self.button_realtime)
         layout_botones.addWidget(self.button_upload)
+        layout_botones.addWidget(self.button_validation)
 
         #Configurar Estilo de los botones
         self.button_realtime.setMaximumWidth(200)
         self.button_upload.setMaximumWidth(200)
+        self.button_validation.setMaximumWidth(200)
 
         layout_botones.setSpacing(10)
         layout_botones.setContentsMargins(0, 0, 0, 0)
@@ -30,4 +33,5 @@ class HomeScreen(QWidget):
 
         self.button_realtime.clicked.connect(lambda: self.navegar.emit(1))
         self.button_upload.clicked.connect(lambda: self.navegar.emit(2))
+        self.button_validation.clicked.connect(lambda: self.navegar.emit(3))
 

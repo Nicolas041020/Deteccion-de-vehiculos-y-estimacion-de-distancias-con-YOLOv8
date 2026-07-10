@@ -65,13 +65,11 @@ class UploadScreen(QWidget):
                 imagen = cv2.imread(filename)
                 raw_result = self.yolo.detect(imagen)
                 self.imagen_actual = raw_result[0].plot()
-                detecciones = self.yolo.parseToDictionary(None,raw_result)
+                detecciones = self.yolo.parseToDictionary(raw_result)
                 self.mostrar_resultados(self.imagen_actual)
-                self.procesar_detecciones(detecciones)
-                #for r in detection:
-                #     print(r.boxes)
-                #     print(r.boxes.cls)                #print('Distancias')
-                #print(DistanceEstimation.runValidation(filename,detection[0].boxes))
+                filtradas = self.procesar_detecciones(detecciones)
+                #print(DistanceEstimation.obtenerVehiculoMasCercano(filtradas))
+                print(DistanceEstimation.distanciasIntervehiculares(filtradas))
                 pass
             elif tipo == 'vid':
                 if hasattr(self, 'worker') and self.worker.isRunning():
@@ -107,4 +105,5 @@ class UploadScreen(QWidget):
         print(f"Detecciones totales: {len(detecciones)} | Filtradas ROI: {len(filtradas)}")
         for fil in filtradas:
              print(fil['clase_id'])
+        return filtradas
 
