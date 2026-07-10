@@ -322,14 +322,19 @@ class DistanceEstimation:
     @staticmethod
     def distanciasIntervehiculares(detecciones):
         det = DistanceEstimation.obtainPixelHeight(detecciones)
-        fx,fy,cx,cy = DistanceEstimation.obtenerParametrosCamara()
-        r_temp, angulo_min, obj_min, idx_min = DistanceEstimation.obtenerVehiculoMasCercano(det,fx,fy,cx)
-        vecinos = DistanceEstimation.obtenerDosVehiculosMasCercanos(det,idx_min,r_temp,cx,fx,fy)
-        distancias =[]
+        if not det:
+            return None, None, []
+        fx, fy, cx, cy = DistanceEstimation.obtenerParametrosCamara()
+        r_temp, angulo_min, obj_min, idx_min = DistanceEstimation.obtenerVehiculoMasCercano(det, fx, fy, cx)
+        if obj_min is None:
+            return None, None, []
+        z_ref = DistanceEstimation.estimateDistance(obj_min['H_mean'], obj_min['H_px'], fy)
+        vecinos = DistanceEstimation.obtenerDosVehiculosMasCercanos(det, idx_min, r_temp, cx, fx, fy)
+        distancias = []
         for v in vecinos:
-            distancias.append((DistanceEstimation.calcularDistanciaIntervehicular(r_temp,angulo_min,v[1],v[2]),v[3]))
-
-        return distancias
+            d_AB = DistanceEstimation.calcularDistanciaIntervehicular(r_temp, angulo_min, v[1], v[2])
+            distancias.append((d_AB, v[3]))
+        return z_ref, obj_min, distancias
 
 
 
