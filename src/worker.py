@@ -6,9 +6,11 @@ import os
 import time
 from src.detection.yolo_detection import YoloDetection
 
+
 class Worker(QThread):
     frameReady = pyqtSignal(np.ndarray)
     detecciones = pyqtSignal(list)
+    finVideo = pyqtSignal()
 
     def __init__(self, fuente=0):
         super().__init__()
@@ -16,6 +18,7 @@ class Worker(QThread):
         self._yolo_activo = False
         self.modelo = None
         self.fuente = fuente
+        
         
     def run(self):
         cap = cv2.VideoCapture(self.fuente)
@@ -33,17 +36,18 @@ class Worker(QThread):
             if self._yolo_activo and self.modelo is not None:
                 results = self.modelo(frame)
                 self.detecciones.emit(YoloDetection.parseToDictionary(None,results))
-                frame = results[0].plot()
-                print(self.modelo.device)
+                # En caso de que los jueces quieran ver los bboxes se descomentan estas dos lineasss
+                #frame = results[0].plot()
+                #print(self.modelo.device)
 
             self.frameReady.emit(frame)
             time.sleep(delay)
 
         cap.release()
+        self.finVideo.emit()
 
     def stop(self):
         self._corriendo = False
-        self.wait()
 
     def activar_yolo(self):
         if self.modelo is None:

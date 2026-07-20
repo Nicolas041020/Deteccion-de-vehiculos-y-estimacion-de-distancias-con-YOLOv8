@@ -335,6 +335,16 @@ class DistanceEstimation:
             d_AB = DistanceEstimation.calcularDistanciaIntervehicular(r_temp, angulo_min, v[1], v[2])
             distancias.append((d_AB, v[3]))
         return z_ref, obj_min, distancias
+    
+
+    @staticmethod
+    def clasificacionDeDistancia(distancia):
+        if distancia < 5.0:
+            return "ALTO"
+        elif distancia < 15.0:
+            return "MEDIO"
+        else:
+            return "BAJO"
 
 
 

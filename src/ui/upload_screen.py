@@ -9,6 +9,8 @@ from src.worker import Worker
 from src.distanceEstimation.Distance_Estimation import DistanceEstimation
 import os
 from src.detection.roi_filter import RoiFilter
+from src.email.EmailSender import EmailSender
+from dotenv import load_dotenv
 
 
 class UploadScreen(QWidget):
@@ -16,6 +18,8 @@ class UploadScreen(QWidget):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     ruta = os.path.join(BASE_DIR, '..', '..', 'models', 'yolov8n.pt')
     yolo = YoloDetection(ruta)
+    
+
 
     def __init__(self):
         super().__init__()
@@ -23,6 +27,12 @@ class UploadScreen(QWidget):
         self._obj_ref = None
         self._vecinos = []
         self._init_ui()
+        load_dotenv()
+
+        email_origen  = os.getenv('EMAIL_ORIGEN')
+        email_password = os.getenv('EMAIL_PASSWORD')
+        email_destino  = os.getenv('EMAIL_DESTINO')
+        self.emailSender = EmailSender(email_origen, email_password,email_destino)
 
     def _init_ui(self):
         self.label_archivo = QLabel("Resultados")
@@ -86,13 +96,15 @@ class UploadScreen(QWidget):
             h, w = imagen_plot.shape[:2]
             self.roi = RoiFilter(w, h)
             self.procesar_detecciones(detecciones)
-            self.mostrar_resultados(imagen_plot)
+            self.mostrar_resultados(imagen)
+            self.on_finVideo()
         elif tipo == 'vid':
             if hasattr(self, 'worker') and self.worker.isRunning():
                 self.worker.stop()
             self.worker = Worker(fuente=filename)
             self.worker.frameReady.connect(self.mostrar_resultados)
             self.worker.detecciones.connect(self.procesar_detecciones)
+            self.worker.finVideo.connect(self.on_finVideo)
             self.worker.activar_yolo()
             self.worker.start()
 
@@ -111,17 +123,17 @@ class UploadScreen(QWidget):
         cy_ref = int((y1r + y2r) / 2)
         cv2.circle(imagen, (cx_ref, cy_ref), 7, (0, 255, 0), -1)
 
-        # naranja y azul (BGR)
-        colores = [(0, 140, 255), (255, 80, 0)]
-        for idx, (d_AB, obj_v) in enumerate(self._vecinos):
+        colores_label = {"ALTO": (0, 0, 255), "MEDIO": (0, 255, 255), "BAJO": (0, 255, 0)}
+        for d_ab, obj_v in self._vecinos:
+            label = DistanceEstimation.clasificacionDeDistancia(d_ab)
             x1v, y1v, x2v, y2v = obj_v['bbox']
             cx_v = int((x1v + x2v) / 2)
             cy_v = int((y1v + y2v) / 2)
-            color = colores[idx % len(colores)]
+            color = colores_label[label]
             cv2.line(imagen, (cx_ref, cy_ref), (cx_v, cy_v), color, 2)
             mx = (cx_ref + cx_v) // 2
             my = (cy_ref + cy_v) // 2
-            cv2.putText(imagen, f"{d_AB:.2f} m", (mx + 5, my - 5),
+            cv2.putText(imagen, f"{d_ab:.2f} m", (mx + 5, my - 5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
 
     def _actualizar_panel(self):
@@ -161,6 +173,14 @@ class UploadScreen(QWidget):
             self._distancia_ref = z_ref
             self._obj_ref = obj_ref
             self._vecinos = vecinos if vecinos else []
+
+            for d_ab, obj_vecino in self._vecinos:
+                self.emailSender.registrar_frame(
+                    d_ab,
+                    obj_ref['clase_id'] if obj_ref else None,
+                    obj_vecino['clase_id']
+                )
+
         except Exception as e:
             print(f"Error estimando distancias: {e}")
             self._distancia_ref = None
@@ -168,3 +188,11 @@ class UploadScreen(QWidget):
             self._vecinos = []
         self._actualizar_panel()
         return filtradas
+    
+    def on_finVideo(self):
+        self.emailSender.enviar_informe()
+    
+    
+
+    
+
