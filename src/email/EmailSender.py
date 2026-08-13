@@ -17,8 +17,10 @@ class EmailSender:
         self.eventos_riesgo = []  # lista de eventos
         self.inicio_sesion = datetime.now()
     
-    def registrar_frame(self, d_AB, clase_ref, clase_vecino):
+    def registrar_frame_procesado(self):
         self.total_frames += 1
+
+    def registrar_frame(self, d_AB, clase_ref, clase_vecino):
         if d_AB is not None and d_AB < 5:
             self.frames_riesgo_alto += 1
             self.eventos_riesgo.append({

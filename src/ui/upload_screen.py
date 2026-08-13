@@ -130,11 +130,11 @@ class UploadScreen(QWidget):
             cx_v = int((x1v + x2v) / 2)
             cy_v = int((y1v + y2v) / 2)
             color = colores_label[label]
-            cv2.line(imagen, (cx_ref, cy_ref), (cx_v, cy_v), color, 2)
+            cv2.line(imagen, (cx_ref, cy_ref), (cx_v, cy_v), color, 5)
             mx = (cx_ref + cx_v) // 2
             my = (cy_ref + cy_v) // 2
             cv2.putText(imagen, f"{d_ab:.2f} m", (mx + 5, my - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
     def _actualizar_panel(self):
         if self._obj_ref is None or self._distancia_ref is None:
@@ -168,11 +168,14 @@ class UploadScreen(QWidget):
             return
         filtradas = self.roi.filtro(detecciones)
         print(f"Detecciones totales: {len(detecciones)} | Filtradas ROI: {len(filtradas)}")
+        self.emailSender.registrar_frame_procesado()
         try:
             z_ref, obj_ref, vecinos = DistanceEstimation.distanciasIntervehiculares(filtradas)
             self._distancia_ref = z_ref
             self._obj_ref = obj_ref
             self._vecinos = vecinos if vecinos else []
+
+            
 
             for d_ab, obj_vecino in self._vecinos:
                 self.emailSender.registrar_frame(
