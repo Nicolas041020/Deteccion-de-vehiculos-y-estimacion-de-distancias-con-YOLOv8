@@ -1,0 +1,20 @@
+# ── PyTorch CPU (sin CUDA) ─────────────────────────────────────────────────
+# En Raspberry Pi los wheels de PyPI ya son CPU-only para aarch64.
+# Si estás en x86 Linux/Windows instalá con:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
+torchvision>=0.15.0
+
+# ── Inferencia ─────────────────────────────────────────────────────────────
+ultralytics==8.4.37
+# Headless: sin dependencias de GUI (X11/Qt), necesario en RPi sin escritorio
+opencv-python-headless>=4.8.0
+
+# ── Datos / utilidades ─────────────────────────────────────────────────────
+numpy>=1.24.0
+psutil==7.2.2
+PyYAML==6.0.3
+Pillow==12.1.1
+matplotlib==3.10.8
+scipy==1.17.1
+requests==2.33.1
