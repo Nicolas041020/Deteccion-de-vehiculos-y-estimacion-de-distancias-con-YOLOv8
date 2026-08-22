@@ -22,4 +22,3 @@ class RoiFilter:
             if resultado > 0 and dec['clase_id'] in clase_interes:
                 res.append(dec)
         return res
-    
