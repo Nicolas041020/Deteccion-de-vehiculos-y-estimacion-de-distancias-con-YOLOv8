@@ -11,10 +11,14 @@ ultralytics==8.4.37
 opencv-python-headless>=4.8.0
 
 # ── Datos / utilidades ─────────────────────────────────────────────────────
+
+
 numpy>=1.24.0
 psutil==7.2.2
+matplotlib==3.10.8
+
 PyYAML==6.0.3
 Pillow==12.1.1
-matplotlib==3.10.8
+
 scipy==1.17.1
 requests==2.33.1
