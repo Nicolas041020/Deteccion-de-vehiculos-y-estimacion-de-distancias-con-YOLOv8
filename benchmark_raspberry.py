@@ -45,7 +45,7 @@ print(f"Directorio : {os.getcwd()}")
 PLATAFORMA = "Raspberry Pi"   # cambiá a "PC" si corrés en PC
 
 rutaModelo = os.path.join(ruta_proyecto, 'models', 'yolov8n.onnx')
-rutaVideo  = os.path.join(ruta_proyecto, 'data', 'samples', 'Val.mp4')
+rutaVideo  = os.path.join(ruta_proyecto, 'data', 'samples', 'Evaluation.mp4')
 
 detector = YoloDetection(rutaModelo)
 
