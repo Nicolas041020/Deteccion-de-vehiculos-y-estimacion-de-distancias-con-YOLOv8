@@ -44,10 +44,11 @@ print(f"Directorio : {os.getcwd()}")
 # ── Cargar modelo y video ──────────────────────────────────────────────────
 PLATAFORMA = "Raspberry Pi"   # cambiá a "PC" si corrés en PC
 
-rutaModelo = os.path.join(ruta_proyecto, 'models', 'yolov8n.onnx')
-rutaVideo  = os.path.join(ruta_proyecto, 'data', 'samples', 'Evaluation.mp4')
+rutaModelo = os.path.join(ruta_proyecto, 'models', 'yolov8n.pt')
+rutaVideo  = os.path.join(ruta_proyecto, 'data', 'samples', 'valCorto.mp4')
 
 detector = YoloDetection(rutaModelo)
+detector.export(format="ncnn")
 
 cap = cv2.VideoCapture(rutaVideo)
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
