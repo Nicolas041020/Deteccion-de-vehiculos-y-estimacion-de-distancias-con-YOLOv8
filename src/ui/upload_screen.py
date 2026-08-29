@@ -123,7 +123,7 @@ class UploadScreen(QWidget):
         cy_ref = int((y1r + y2r) / 2)
         cv2.circle(imagen, (cx_ref, cy_ref), 7, (0, 255, 0), -1)
 
-        colores_label = {"ALTO": (0, 0, 255), "MEDIO": (0, 255, 255), "BAJO": (0, 255, 0)}
+        colores_label = {"Riesgo": (0, 0, 255), "No Riesgo": (0, 255, 0)}
         for d_ab, obj_v in self._vecinos:
             label = DistanceEstimation.clasificacionDeDistancia(d_ab)
             x1v, y1v, x2v, y2v = obj_v['bbox']

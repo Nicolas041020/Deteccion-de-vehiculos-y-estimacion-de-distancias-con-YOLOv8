@@ -268,6 +268,7 @@ class DistanceEstimation:
         clases_interes = [2,3,5,7]  # car, motorcycle, Bus y Truck
         lista_tamanos =[]
         H_mean = 0.0
+        W_mean = 0.0
         for dec in detecciones:
             clase_id = int(dec['clase_id'])
             if clase_id not in clases_interes:
@@ -275,10 +276,13 @@ class DistanceEstimation:
 
             if clase_id == 2:
                 H_mean = 1.55
+                W_mean = 1.80
             elif clase_id == 3:
                 H_mean = 0.80
+                W_mean = 0.50
             elif clase_id == 5 or clase_id == 7:
                 H_mean = 3.0
+                W_mean = 2.60
 
             x1, y1, x2, y2 = dec['bbox']
             H_px = y2 - y1
@@ -286,6 +290,7 @@ class DistanceEstimation:
                 'clase_id': clase_id,
                 'H_px': float(H_px),
                 'H_mean':float(H_mean),
+                'W_mean':float(W_mean),
                 'bbox': (float(x1), float(y1), float(x2), float(y2)),
                 'conf': float(dec['conf'])
             })
@@ -333,18 +338,18 @@ class DistanceEstimation:
         distancias = []
         for v in vecinos:
             d_AB = DistanceEstimation.calcularDistanciaIntervehicular(r_temp, angulo_min, v[1], v[2])
+            # Se descuenta medio ancho de cada uno de los dos vehiculos
+            d_AB = max(0.0, d_AB - (obj_min['W_mean'] + v[3]['W_mean']) / 2)
             distancias.append((d_AB, v[3]))
         return z_ref, obj_min, distancias
     
 
     @staticmethod
     def clasificacionDeDistancia(distancia):
-        if distancia < 5.0:
-            return "ALTO"
-        elif distancia < 15.0:
-            return "MEDIO"
+        if distancia < 1.5:
+            return "Riesgo"
         else:
-            return "BAJO"
+            return "No Riesgo"
 
 
 
