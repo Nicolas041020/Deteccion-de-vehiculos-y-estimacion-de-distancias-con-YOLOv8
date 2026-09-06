@@ -96,7 +96,7 @@ class UploadScreen(QWidget):
             h, w = imagen_plot.shape[:2]
             self.roi = RoiFilter(w, h)
             self.procesar_detecciones(detecciones)
-            self.mostrar_resultados(imagen)
+            self.mostrar_resultados(imagen_plot)
             self.on_finVideo()
         elif tipo == 'vid':
             if hasattr(self, 'worker') and self.worker.isRunning():
@@ -104,6 +104,7 @@ class UploadScreen(QWidget):
             self.worker = Worker(fuente=filename)
             self.worker.frameReady.connect(self.mostrar_resultados)
             self.worker.detecciones.connect(self.procesar_detecciones)
+            self.worker.videoInfo.connect(self.emailSender.iniciar_sesion)
             self.worker.finVideo.connect(self.on_finVideo)
             self.worker.activar_yolo()
             self.worker.start()
@@ -168,27 +169,29 @@ class UploadScreen(QWidget):
             return
         filtradas = self.roi.filtro(detecciones)
         print(f"Detecciones totales: {len(detecciones)} | Filtradas ROI: {len(filtradas)}")
-        self.emailSender.registrar_frame_procesado()
+        pares = []
         try:
             z_ref, obj_ref, vecinos = DistanceEstimation.distanciasIntervehiculares(filtradas)
             self._distancia_ref = z_ref
             self._obj_ref = obj_ref
             self._vecinos = vecinos if vecinos else []
 
-            
-
             for d_ab, obj_vecino in self._vecinos:
-                self.emailSender.registrar_frame(
-                    d_ab,
-                    obj_ref['clase_id'] if obj_ref else None,
-                    obj_vecino['clase_id']
-                )
+                pares.append({
+                    'ids': (obj_ref.get('track_id'), obj_vecino.get('track_id')),
+                    'clases': (obj_ref['clase_id'], obj_vecino['clase_id']),
+                    'd_AB': d_ab,
+                    'nivel': DistanceEstimation.clasificacionDeDistancia(d_ab),
+                })
 
         except Exception as e:
             print(f"Error estimando distancias: {e}")
             self._distancia_ref = None
             self._obj_ref = None
             self._vecinos = []
+        # Siempre una llamada por frame, aunque no haya pares, para que los
+        # eventos abiertos acumulen ausencia y se cierren cuando corresponde.
+        self.emailSender.registrar_frame(pares)
         self._actualizar_panel()
         return filtradas
     
